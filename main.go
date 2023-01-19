@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/DmytroSolodukhin/sapper/game"
 	"log"
 	"runtime/debug"
+
+	"github.com/DmytroSolodukhin/sapper/game"
 )
 
 func main() {

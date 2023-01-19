@@ -2,6 +2,7 @@ package output
 
 import (
 	"fmt"
+
 	"github.com/DmytroSolodukhin/sapper/model"
 )
 

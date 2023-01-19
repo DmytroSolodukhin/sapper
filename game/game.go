@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+
 	"github.com/DmytroSolodukhin/sapper/model"
 	out "github.com/DmytroSolodukhin/sapper/output"
 	"github.com/DmytroSolodukhin/sapper/validators"
@@ -22,6 +23,7 @@ type Output interface {
 	ErrorMsg()
 }
 
+// Start game.
 func Start() {
 	validator := validators.New(minParameterSize, maxParameterSize)
 	x, y, mines := out.InitializePlayingField(validator)
@@ -49,7 +51,7 @@ func run(arena model.Arena) {
 		return
 	}
 
-	if checkWin(arena) {
+	if arena.Win() {
 		out.ShowFull(arena)
 		out.Win()
 
@@ -57,20 +59,6 @@ func run(arena model.Arena) {
 	}
 
 	run(arena)
-
-	return
-}
-
-func checkWin(arena model.Arena) bool {
-	for _, x := range arena {
-		for _, y := range x {
-			if !y.IsOpen() && !y.IsMine() {
-				return false
-			}
-		}
-	}
-
-	return true
 }
 
 func checkCell(arena model.Arena, x, y int) error {

@@ -18,10 +18,10 @@ type Cell struct {
 
 // New initialize playing field.
 func New(x, y, mines int) Arena {
-	arena := make(Arena, x, x)
+	arena := make(Arena, x)
 
 	for i := range arena {
-		arena[i] = make([]Cell, y, y)
+		arena[i] = make([]Cell, y)
 	}
 
 	for i := 0; i <= mines; i++ {
@@ -39,17 +39,19 @@ func (p Arena) Open(x, y int) bool {
 
 	p[x][y].open = true
 
-	p.visiting(func(xs, ys int) {
-		if p[xs][ys].open || p[xs][ys].IsMine() {
-			return
-		}
+	p.visiting(p.open, x, y)
 
-		p[xs][ys].open = true
+	return true
+}
 
-		if p[xs][ys].marker == 0 {
-			p.Open(xs, ys)
+func (p Arena) Win() bool {
+	for _, x := range p {
+		for _, y := range x {
+			if !y.open && !y.hflag {
+				return false
+			}
 		}
-	}, x, y)
+	}
 
 	return true
 }
@@ -57,22 +59,34 @@ func (p Arena) Open(x, y int) bool {
 func (p Arena) randomSetMine() {
 	rand.Seed(time.Now().UnixNano())
 
-	x := rand.Intn(len(p))
-	y := rand.Intn(len(p[0]))
+	x := rand.Intn(len(p))    //nolint
+	y := rand.Intn(len(p[0])) //nolint
 
 	if p[x][y].IsMine() {
 		p.randomSetMine()
 
-		return
+		return //nolint
 	}
 
 	p[x][y].hflag = true
 
-	p.visiting(func(xs, ys int) {
-		p[xs][ys].marker++
-	}, x, y)
+	p.visiting(p.marked, x, y)
+}
 
-	return
+func (p Arena) marked(x, y int) {
+	p[x][y].marker++
+}
+
+func (p Arena) open(x, y int) {
+	if p[x][y].open || p[x][y].IsMine() {
+		return
+	}
+
+	p[x][y].open = true
+
+	if p[x][y].marker == 0 {
+		p.Open(x, y)
+	}
 }
 
 func (p Arena) visiting(f func(x, y int), x, y int) {
